@@ -39,14 +39,25 @@ st.markdown("""
     background-color: #FFF9F2;
 }
 
+/* Hide Streamlit default header and toolbar */
+
+header[data-testid="stHeader"] {
+    display: none;
+}
+
+[data-testid="stToolbar"] {
+    display: none;
+}
+
 /* Main container */
 
 .block-container {
     max-width: 1100px;
-    padding-top: 1rem;
+    padding-top: 2rem !important;
     padding-bottom: 1rem;
     padding-left: 2rem;
     padding-right: 2rem;
+    margin-top: 0;
 }
 
 /* Hide unnecessary Streamlit elements */
@@ -63,9 +74,12 @@ footer {
 
 .header-box {
     background-color: #720D2B;
-    padding: 15px 25px;
+    padding: 18px 25px;
     border-radius: 12px;
+    margin-top: 5px;
     margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .header-title {
