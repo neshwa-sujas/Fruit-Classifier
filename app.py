@@ -21,7 +21,7 @@ IMAGE_SIZE = (160, 160)
 
 st.set_page_config(
     page_title="Fruit Classifier",
-    page_icon="🍎",
+    page_icon="🥝",
     layout="wide"
 )
 
