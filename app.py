@@ -1,4 +1,4 @@
-```python
+
 import json
 from pathlib import Path
 from textwrap import dedent
@@ -494,4 +494,3 @@ st.markdown(
     '</div>',
     unsafe_allow_html=True
 )
-```
