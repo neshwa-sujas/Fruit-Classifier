@@ -410,29 +410,17 @@ with col2:
 if classify and image is not None:
 
     try:
-
         with st.spinner("Analyzing your image..."):
 
-            # Resize image
-
             resized = image.resize(IMAGE_SIZE)
-
-            # Convert to NumPy array
 
             arr = np.asarray(
                 resized,
                 dtype=np.float32
             )
 
-            # Preprocess image
-
             arr = preprocess_input(arr)
-
-            # Add batch dimension
-
             arr = np.expand_dims(arr, axis=0)
-
-            # Predict
 
             probabilities = model.predict(
                 arr,
@@ -443,52 +431,52 @@ if classify and image is not None:
 
             predicted = class_names[best_index]
 
-            confidence = float(probabilities[best_index]) * 100
+            confidence = float(probabilities[best_index])
 
-        # Display result
+        # Check whether the image is likely to be a fruit
 
-        render_html(f"""
-        <div class="result-card">
+        MIN_CONFIDENCE = 0.70
 
-            <div class="result-label">
-                Predicted Fruit
-            </div>
+        st.markdown("---")
 
-            <div class="result-name">
-                🍎 {predicted}
-            </div>
+        if confidence < MIN_CONFIDENCE:
 
-            <div class="result-confidence">
-                Confidence: {confidence:.2f}%
-            </div>
-
-        </div>
-        """)
-
-        # Class probabilities
-
-        with st.expander("View Class Probabilities"):
-
-            sorted_results = sorted(
-                zip(class_names, probabilities),
-                key=lambda x: x[1],
-                reverse=True
+            st.warning(
+                "⚠️ Not a fruit! Please upload a valid fruit image."
             )
 
-            for name, score in sorted_results:
+        else:
 
-                st.write(
-                    f"**{name}** — {score * 100:.2f}%"
+            st.markdown("### 🍎 Prediction Result")
+
+            st.success(f"Predicted Fruit: {predicted}")
+
+            st.metric(
+                label="Confidence",
+                value=f"{confidence * 100:.2f}%"
+            )
+
+            with st.expander("View Class Probabilities"):
+
+                sorted_results = sorted(
+                    zip(class_names, probabilities),
+                    key=lambda x: x[1],
+                    reverse=True
                 )
 
-                st.progress(
-                    float(np.clip(score, 0, 1))
-                )
+                for name, score in sorted_results:
+
+                    st.write(
+                        f"**{name}** — {score * 100:.2f}%"
+                    )
+
+                    st.progress(
+                        float(np.clip(score, 0, 1))
+                    )
 
     except Exception as e:
 
         st.error(f"Prediction failed: {e}")
-
 
 # ==========================================
 # MODEL INFORMATION
