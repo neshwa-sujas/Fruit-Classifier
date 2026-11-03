@@ -273,7 +273,7 @@ hr {
 render_html("""
 <div class="header-box">
     <div class="header-title">
-        🍎 Fruit Classifier
+        🥝 Fruit Classifier
     </div>
 </div>
 """)
