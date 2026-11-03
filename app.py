@@ -5,6 +5,7 @@ from html import escape
 import numpy as np
 import streamlit as st
 import tensorflow as tf
+
 from PIL import Image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
@@ -32,17 +33,21 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Background */
+/* PAGE BACKGROUND */
 
 .stApp {
-    background-color: #FFF9F2;
+    background: linear-gradient(
+        135deg,
+        #FFF8F1,
+        #FFFDFB,
+        #FFF2F3
+    );
 }
 
-/* Hide Streamlit header */
+/* HIDE STREAMLIT ELEMENTS */
 
 [data-testid="stHeader"] {
-    height: 0;
-    visibility: hidden;
+    display: none;
 }
 
 [data-testid="stToolbar"] {
@@ -54,175 +59,384 @@ footer {
     visibility: hidden;
 }
 
-/* Main container */
+/* MAIN CONTAINER */
 
 .block-container {
-    max-width: 1050px;
-    padding-top: 1.5rem !important;
+    max-width: 1250px;
+    padding-top: 2rem !important;
     padding-bottom: 1rem;
     padding-left: 2rem;
     padding-right: 2rem;
 }
 
-/* Top maroon bar */
+/* =================================
+   HEADER
+================================= */
 
 .header-box {
-    background-color: #720D2B;
-    border-radius: 12px;
-    padding: 19px 20px;
+    background: linear-gradient(
+        110deg,
+        #A20D43,
+        #850B38,
+        #670B30
+    );
+
+    border-radius: 27px;
+
+    min-height: 145px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     text-align: center;
+
     margin-bottom: 35px;
-    width: 100%;
-    box-sizing: border-box;
+
+    box-shadow: 0 12px 25px rgba(133, 11, 56, 0.15);
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+.header-box::before {
+    content: "🍃";
+    position: absolute;
+    left: 35px;
+    top: 35px;
+    font-size: 48px;
+    opacity: 0.35;
+}
+
+.header-box::after {
+    content: "🍃";
+    position: absolute;
+    right: 35px;
+    top: 35px;
+    font-size: 48px;
+    opacity: 0.35;
 }
 
 .header-title {
     color: white !important;
-    font-size: 27px;
-    font-weight: 700;
+    font-size: 48px;
+    font-weight: 750;
     margin: 0;
-    padding: 0;
+    letter-spacing: 0.5px;
 }
 
-/* Section headings */
+/* =================================
+   DECORATIVE FRUITS
+================================= */
 
-.section-title {
-    color: #35132E;
-    font-size: 21px;
-    font-weight: 650;
+.fruit-decoration {
+    text-align: left;
+    font-size: 35px;
+    margin-top: -15px;
     margin-bottom: 15px;
 }
 
-/* Upload box */
+/* =================================
+   SECTION HEADINGS
+================================= */
+
+.section-title {
+    color: #780D35;
+    font-size: 22px;
+    font-weight: 750;
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+/* =================================
+   UPLOAD CARD
+================================= */
+
+.upload-card {
+    background: rgba(255,255,255,0.85);
+    border: 1px solid #EBD3DB;
+    border-radius: 25px;
+
+    padding: 25px 22px;
+
+    min-height: 290px;
+
+    box-shadow: 0 8px 20px rgba(120, 13, 53, 0.06);
+}
+
+/* FILE UPLOADER */
 
 [data-testid="stFileUploader"] {
-    background-color: white;
-    border: 1px dashed #B99AA7;
-    border-radius: 12px;
-    padding: 13px;
-    min-height: 110px;
-}
-
-/* File uploader text */
-
-[data-testid="stFileUploader"] section {
-    background-color: #F7F4F5;
-    border-radius: 9px;
-}
-
-/* Preview image */
-
-[data-testid="stImage"] {
+    background: #FFF9FC;
+    border: 2px dashed #D78BAE;
+    border-radius: 19px;
+    padding: 18px;
+    min-height: 190px;
     display: flex;
     justify-content: center;
 }
 
+[data-testid="stFileUploader"] section {
+    background: transparent;
+    border: none;
+}
+
+[data-testid="stFileUploader"] button {
+    background: linear-gradient(
+        110deg,
+        #C30D50,
+        #850B38
+    );
+    color: white;
+    border: none;
+    border-radius: 30px;
+}
+
+[data-testid="stFileUploader"] button:hover {
+    color: white;
+    border: none;
+    background: #690A30;
+}
+
+/* =================================
+   PREVIEW CARD
+================================= */
+
+.preview-card {
+    background: linear-gradient(
+        135deg,
+        #FBE5F0,
+        #F7DDEA
+    );
+
+    border-radius: 20px;
+
+    height: 220px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    color: #965B7C;
+}
+
+.preview-icon {
+    font-size: 65px;
+    margin-bottom: 8px;
+}
+
+.preview-text {
+    font-size: 19px;
+    font-weight: 650;
+}
+
+/* PREVIEW IMAGE */
+
+[data-testid="stImage"] {
+    background: #FBE5F0;
+    border-radius: 20px;
+    padding: 10px;
+    height: 220px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
 [data-testid="stImage"] img {
-    max-height: 220px;
+    max-height: 200px;
     object-fit: contain;
     border-radius: 12px;
 }
 
-/* Empty preview box */
+/* =================================
+   CLASSIFY BUTTON
+================================= */
 
-.preview-box {
-    background-color: #F3EBED;
-    height: 205px;
-    border-radius: 12px;
+.stButton {
     display: flex;
     justify-content: center;
-    align-items: center;
-    color: #8A7880;
-    font-size: 15px;
-    text-align: center;
 }
-
-/* Supported formats */
-
-.upload-caption {
-    color: #888888;
-    font-size: 13px;
-    margin-top: 8px;
-}
-
-/* Classification button */
 
 .stButton > button {
-    background-color: #850E3A;
+
+    background: linear-gradient(
+        110deg,
+        #C30D50,
+        #850B38,
+        #690A30
+    );
+
     color: white;
+
     border: none;
-    border-radius: 9px;
-    font-size: 17px;
-    font-weight: 600;
-    min-height: 46px;
-    transition: 0.2s;
+    border-radius: 35px;
+
+    min-height: 65px;
+
+    font-size: 22px;
+    font-weight: 750;
+
+    box-shadow: 0 8px 18px rgba(133, 11, 56, 0.18);
+
+    transition: 0.25s;
 }
 
 .stButton > button:hover {
-    background-color: #5F0929;
+    background: linear-gradient(
+        110deg,
+        #A20D43,
+        #670B30
+    );
+
     color: white;
     border: none;
+
+    transform: translateY(-2px);
 }
 
-/* Prediction card */
+/* =================================
+   PREDICTION RESULT
+================================= */
 
 .result-card {
-    background-color: #F4EAF0;
-    border: 1px solid #E5CCD8;
-    border-radius: 13px;
-    padding: 16px;
+    background: linear-gradient(
+        135deg,
+        #FBE5F0,
+        #F5DCE8
+    );
+
+    border: 1px solid #E8C5D5;
+    border-radius: 20px;
+
+    padding: 22px;
+
     text-align: center;
-    margin-top: 18px;
+
+    margin-top: 20px;
 }
 
 .result-label {
-    color: #666666;
-    font-size: 15px;
+    color: #735568;
+    font-size: 17px;
 }
 
 .result-name {
-    color: #850E3A;
-    font-size: 28px;
-    font-weight: bold;
-    margin: 5px 0;
+    color: #850B38;
+    font-size: 32px;
+    font-weight: 750;
+    margin: 8px 0;
 }
 
 .result-confidence {
     color: #35132E;
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 17px;
+    font-weight: 650;
 }
 
-/* Expander */
+/* =================================
+   DIVIDER
+================================= */
 
-[data-testid="stExpander"] {
-    border: 1px solid #E5CCD8;
-    border-radius: 10px;
-    background-color: white;
-    margin-top: 10px;
+.custom-divider {
+    height: 2px;
+
+    background: linear-gradient(
+        to right,
+        transparent,
+        #D58AA9,
+        #850B38,
+        #D58AA9,
+        transparent
+    );
+
+    margin-top: 35px;
+    margin-bottom: 30px;
 }
 
-/* Reduce vertical spacing */
+/* =================================
+   INFORMATION CARDS
+================================= */
 
-div[data-testid="stVerticalBlock"] {
-    gap: 0.65rem;
+.info-card {
+    background: rgba(255,255,255,0.75);
+
+    border: 1px solid #E5C5D0;
+
+    border-radius: 22px;
+
+    min-height: 105px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 17px;
+
+    padding: 12px;
+
+    box-shadow: 0 5px 15px rgba(120, 13, 53, 0.05);
 }
 
-/* Responsive design */
+.info-icon {
+    font-size: 43px;
+}
 
-@media (max-width: 650px) {
+.info-heading {
+    color: #850B38;
+    font-size: 19px;
+    font-weight: 750;
+}
+
+.info-text {
+    color: #25243C;
+    font-size: 17px;
+    margin-top: 4px;
+}
+
+/* =================================
+   FOOTER
+================================= */
+
+.footer {
+    text-align: center;
+    color: #987B89;
+    font-size: 13px;
+    margin-top: 35px;
+    padding-bottom: 12px;
+}
+
+/* =================================
+   RESPONSIVE DESIGN
+================================= */
+
+@media (max-width: 700px) {
 
     .block-container {
         padding-left: 1rem;
         padding-right: 1rem;
     }
 
+    .header-box {
+        min-height: 100px;
+    }
+
     .header-title {
-        font-size: 23px;
+        font-size: 30px;
     }
 
     .section-title {
         font-size: 18px;
+    }
+
+    .info-card {
+        margin-bottom: 10px;
     }
 
 }
@@ -243,7 +457,18 @@ st.markdown("""
 
 
 # ==========================================
-# LOAD TRAINED MODEL
+# DECORATIVE FRUITS
+# ==========================================
+
+st.markdown("""
+<div class="fruit-decoration">
+    🍓 🍊 🍃
+</div>
+""", unsafe_allow_html=True)
+
+
+# ==========================================
+# LOAD MODEL
 # ==========================================
 
 @st.cache_resource
@@ -276,47 +501,47 @@ if model is None:
 
 
 # ==========================================
-# IMAGE UPLOAD AND PREVIEW
+# UPLOAD AND PREVIEW
 # ==========================================
 
 left, right = st.columns(2, gap="large")
 
 
-# Upload section
+# UPLOAD
 
 with left:
 
-    st.markdown(
-        '<div class="section-title">📤 Upload Image</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div class="section-title">
+        Upload a Fruit Image
+    </div>
+    """, unsafe_allow_html=True)
 
     uploaded = st.file_uploader(
-        "Choose a fruit image",
+        "Choose Image",
         type=["jpg", "jpeg", "png", "webp"],
         label_visibility="collapsed"
     )
 
-    st.markdown(
-        '<div class="upload-caption">'
-        'Supported formats: JPG, PNG, WEBP'
-        '</div>',
-        unsafe_allow_html=True
-    )
+    st.caption("Supported formats: JPG, PNG, WEBP")
 
 
-# Preview section
+# PREVIEW
 
 with right:
 
-    st.markdown(
-        '<div class="section-title">🖼️ Image Preview</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div class="section-title">
+        Image Preview
+    </div>
+    """, unsafe_allow_html=True)
+
+    image = None
 
     if uploaded:
 
         try:
+
             image = Image.open(uploaded).convert("RGB")
 
             st.image(
@@ -325,14 +550,23 @@ with right:
             )
 
         except Exception:
-            st.error("Unable to open this image.")
+
+            st.error("Invalid image file.")
             st.stop()
 
     else:
 
         st.markdown("""
-        <div class="preview-box">
-            Your image will appear here
+        <div class="preview-card">
+
+            <div class="preview-icon">
+                🖼️
+            </div>
+
+            <div class="preview-text">
+                Image Preview
+            </div>
+
         </div>
         """, unsafe_allow_html=True)
 
@@ -343,12 +577,12 @@ with right:
 
 st.write("")
 
-col1, col2, col3 = st.columns([1, 2, 1])
+button_col1, button_col2, button_col3 = st.columns([1, 1.5, 1])
 
-with col2:
+with button_col2:
 
     classify = st.button(
-        "✨  Classify Fruit",
+        "✨  Classify",
         use_container_width=True,
         disabled=uploaded is None
     )
@@ -358,11 +592,11 @@ with col2:
 # PREDICTION
 # ==========================================
 
-if classify and uploaded:
+if classify and uploaded and image is not None:
 
     try:
 
-        with st.spinner("Analyzing image..."):
+        with st.spinner("Analyzing your image..."):
 
             resized = image.resize(IMAGE_SIZE)
 
@@ -383,17 +617,11 @@ if classify and uploaded:
             best_index = int(np.argmax(probabilities))
 
             if best_index >= len(class_names):
-                raise ValueError(
-                    "Model output does not match the class labels."
-                )
+                raise ValueError("Model labels do not match its output.")
 
             predicted = str(class_names[best_index])
 
-            confidence = (
-                float(probabilities[best_index]) * 100
-            )
-
-        # Prediction result
+            confidence = float(probabilities[best_index]) * 100
 
         st.markdown(f"""
         <div class="result-card">
@@ -412,8 +640,6 @@ if classify and uploaded:
 
         </div>
         """, unsafe_allow_html=True)
-
-        # Class probabilities
 
         with st.expander("View Class Probabilities"):
 
@@ -437,16 +663,75 @@ if classify and uploaded:
 
 
 # ==========================================
+# DIVIDER
+# ==========================================
+
+st.markdown("""
+<div class="custom-divider"></div>
+""", unsafe_allow_html=True)
+
+
+# ==========================================
+# MODEL INFORMATION
+# ==========================================
+
+c1, c2, c3 = st.columns(3, gap="medium")
+
+
+with c1:
+
+    st.markdown("""
+    <div class="info-card">
+
+        <div class="info-icon">🧠</div>
+
+        <div>
+            <div class="info-heading">Model</div>
+            <div class="info-text">MobileNetV2</div>
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+
+with c2:
+
+    st.markdown("""
+    <div class="info-card">
+
+        <div class="info-icon">📚</div>
+
+        <div>
+            <div class="info-heading">Dataset</div>
+            <div class="info-text">Fruits-360</div>
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+
+with c3:
+
+    st.markdown("""
+    <div class="info-card">
+
+        <div class="info-icon">⚙️</div>
+
+        <div>
+            <div class="info-heading">Approach</div>
+            <div class="info-text">Transfer Learning</div>
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ==========================================
 # FOOTER
 # ==========================================
 
 st.markdown("""
-<div style="
-    text-align:center;
-    color:#999999;
-    font-size:12px;
-    margin-top:25px;
-">
+<div class="footer">
     Fruit Classifier | Deep Learning Project
 </div>
 """, unsafe_allow_html=True)
