@@ -164,8 +164,10 @@ header[data-testid="stHeader"] {
 /* Disabled button */
 
 .stButton > button:disabled {
-    background: #D8B4C3;
-    color: white;
+    background: linear-gradient(110deg, #A30D43, #700D2B) !important;
+    color: white !important;
+    opacity: 1 !important;
+    border: none !important;
 }
 
 /* Prediction result */
