@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from html import escape
+from textwrap import dedent
 
 import numpy as np
 import streamlit as st
@@ -27,455 +27,268 @@ st.set_page_config(
 
 
 # ==========================================
+# HTML RENDERING HELPER
+# ==========================================
+
+def render_html(content):
+
+    st.markdown(
+        dedent(content).strip(),
+        unsafe_allow_html=True
+    )
+
+
+# ==========================================
 # CUSTOM CSS
 # ==========================================
 
-st.markdown("""
+render_html("""
 <style>
 
-/* PAGE BACKGROUND */
-
 .stApp {
-    background: linear-gradient(
-        135deg,
-        #FFF8F1,
-        #FFFDFB,
-        #FFF2F3
-    );
+    background-color: #FFF8F2;
 }
 
-/* HIDE STREAMLIT ELEMENTS */
-
-[data-testid="stHeader"] {
-    display: none;
-}
-
-[data-testid="stToolbar"] {
-    display: none;
-}
-
-#MainMenu,
-footer {
-    visibility: hidden;
-}
-
-/* MAIN CONTAINER */
+/* Main page */
 
 .block-container {
-    max-width: 1250px;
+    max-width: 1150px;
     padding-top: 2rem !important;
     padding-bottom: 1rem;
     padding-left: 2rem;
     padding-right: 2rem;
 }
 
-/* =================================
-   HEADER
-================================= */
+/* Hide unnecessary elements */
+
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+header[data-testid="stHeader"] {
+    background-color: transparent;
+}
+
+/* Main header */
 
 .header-box {
-    background: linear-gradient(
-        110deg,
-        #A20D43,
-        #850B38,
-        #670B30
-    );
-
-    border-radius: 27px;
-
-    min-height: 145px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
+    background: linear-gradient(110deg, #A30D43, #700D2B);
+    padding: 20px;
+    border-radius: 18px;
     text-align: center;
-
     margin-bottom: 35px;
-
-    box-shadow: 0 12px 25px rgba(133, 11, 56, 0.15);
-
-    position: relative;
-
-    overflow: hidden;
-}
-
-.header-box::before {
-    content: "🍃";
-    position: absolute;
-    left: 35px;
-    top: 35px;
-    font-size: 48px;
-    opacity: 0.35;
-}
-
-.header-box::after {
-    content: "🍃";
-    position: absolute;
-    right: 35px;
-    top: 35px;
-    font-size: 48px;
-    opacity: 0.35;
+    box-shadow: 0 5px 15px rgba(112, 13, 43, 0.12);
 }
 
 .header-title {
-    color: white !important;
-    font-size: 48px;
-    font-weight: 750;
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
     margin: 0;
-    letter-spacing: 0.5px;
 }
 
-/* =================================
-   DECORATIVE FRUITS
-================================= */
+/* Section titles */
 
-.fruit-decoration {
-    text-align: left;
-    font-size: 35px;
-    margin-top: -15px;
+.section-title {
+    color: #72102F;
+    font-size: 21px;
+    font-weight: 700;
     margin-bottom: 15px;
 }
 
-/* =================================
-   SECTION HEADINGS
-================================= */
-
-.section-title {
-    color: #780D35;
-    font-size: 22px;
-    font-weight: 750;
-    text-align: center;
-    margin-bottom: 18px;
-}
-
-/* =================================
-   UPLOAD CARD
-================================= */
-
-.upload-card {
-    background: rgba(255,255,255,0.85);
-    border: 1px solid #EBD3DB;
-    border-radius: 25px;
-
-    padding: 25px 22px;
-
-    min-height: 290px;
-
-    box-shadow: 0 8px 20px rgba(120, 13, 53, 0.06);
-}
-
-/* FILE UPLOADER */
+/* Upload area */
 
 [data-testid="stFileUploader"] {
-    background: #FFF9FC;
-    border: 2px dashed #D78BAE;
-    border-radius: 19px;
-    padding: 18px;
-    min-height: 190px;
-    display: flex;
-    justify-content: center;
+    background-color: #FFFFFF;
+    border: 1.5px dashed #C76B91;
+    border-radius: 15px;
+    padding: 15px;
 }
 
-[data-testid="stFileUploader"] section {
-    background: transparent;
-    border: none;
-}
-
-[data-testid="stFileUploader"] button {
-    background: linear-gradient(
-        110deg,
-        #C30D50,
-        #850B38
-    );
-    color: white;
-    border: none;
-    border-radius: 30px;
-}
-
-[data-testid="stFileUploader"] button:hover {
-    color: white;
-    border: none;
-    background: #690A30;
-}
-
-/* =================================
-   PREVIEW CARD
-================================= */
+/* Preview placeholder */
 
 .preview-card {
-    background: linear-gradient(
-        135deg,
-        #FBE5F0,
-        #F7DDEA
-    );
-
-    border-radius: 20px;
-
-    height: 220px;
-
+    background-color: #F8E7EF;
+    border-radius: 15px;
+    height: 240px;
     display: flex;
     flex-direction: column;
-
     justify-content: center;
     align-items: center;
-
     text-align: center;
-
-    color: #965B7C;
+    color: #985475;
 }
 
 .preview-icon {
     font-size: 65px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .preview-text {
-    font-size: 19px;
-    font-weight: 650;
+    font-size: 20px;
+    font-weight: 600;
 }
 
-/* PREVIEW IMAGE */
-
-[data-testid="stImage"] {
-    background: #FBE5F0;
-    border-radius: 20px;
-    padding: 10px;
-    height: 220px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
+/* Uploaded image */
 
 [data-testid="stImage"] img {
-    max-height: 200px;
+    height: 240px;
+    width: 100%;
     object-fit: contain;
-    border-radius: 12px;
+    border-radius: 15px;
 }
 
-/* =================================
-   CLASSIFY BUTTON
-================================= */
-
-.stButton {
-    display: flex;
-    justify-content: center;
-}
+/* Buttons */
 
 .stButton > button {
-
-    background: linear-gradient(
-        110deg,
-        #C30D50,
-        #850B38,
-        #690A30
-    );
-
+    background: linear-gradient(110deg, #B30F4D, #720D2B);
     color: white;
-
     border: none;
     border-radius: 35px;
-
-    min-height: 65px;
-
-    font-size: 22px;
-    font-weight: 750;
-
-    box-shadow: 0 8px 18px rgba(133, 11, 56, 0.18);
-
-    transition: 0.25s;
+    font-size: 20px;
+    font-weight: 700;
+    min-height: 55px;
+    transition: 0.2s;
 }
 
 .stButton > button:hover {
-    background: linear-gradient(
-        110deg,
-        #A20D43,
-        #670B30
-    );
-
+    background: #5F0929;
     color: white;
     border: none;
-
-    transform: translateY(-2px);
 }
 
-/* =================================
-   PREDICTION RESULT
-================================= */
+/* Disabled button */
+
+.stButton > button:disabled {
+    background: #D8B4C3;
+    color: white;
+}
+
+/* Prediction result */
 
 .result-card {
-    background: linear-gradient(
-        135deg,
-        #FBE5F0,
-        #F5DCE8
-    );
-
-    border: 1px solid #E8C5D5;
-    border-radius: 20px;
-
+    background-color: #F9EAF1;
+    border: 1px solid #E9C9D7;
+    border-radius: 16px;
     padding: 22px;
-
     text-align: center;
-
     margin-top: 20px;
 }
 
 .result-label {
-    color: #735568;
+    color: #555555;
     font-size: 17px;
 }
 
 .result-name {
-    color: #850B38;
+    color: #950D40;
     font-size: 32px;
-    font-weight: 750;
+    font-weight: 700;
     margin: 8px 0;
 }
 
 .result-confidence {
     color: #35132E;
-    font-size: 17px;
-    font-weight: 650;
+    font-size: 18px;
+    font-weight: 600;
 }
 
-/* =================================
-   DIVIDER
-================================= */
-
-.custom-divider {
-    height: 2px;
-
-    background: linear-gradient(
-        to right,
-        transparent,
-        #D58AA9,
-        #850B38,
-        #D58AA9,
-        transparent
-    );
-
-    margin-top: 35px;
-    margin-bottom: 30px;
-}
-
-/* =================================
-   INFORMATION CARDS
-================================= */
+/* Information cards */
 
 .info-card {
-    background: rgba(255,255,255,0.75);
-
-    border: 1px solid #E5C5D0;
-
-    border-radius: 22px;
-
+    background-color: #FFFFFF;
+    border: 1px solid #E8C9D5;
+    border-radius: 17px;
+    padding: 18px 8px;
+    text-align: center;
     min-height: 105px;
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-
-    gap: 17px;
-
-    padding: 12px;
-
-    box-shadow: 0 5px 15px rgba(120, 13, 53, 0.05);
+    box-shadow: 0 4px 10px rgba(114, 13, 43, 0.04);
 }
 
 .info-icon {
-    font-size: 43px;
+    font-size: 30px;
 }
 
 .info-heading {
-    color: #850B38;
-    font-size: 19px;
-    font-weight: 750;
+    color: #850E3A;
+    font-size: 17px;
+    font-weight: 700;
 }
 
 .info-text {
-    color: #25243C;
-    font-size: 17px;
-    margin-top: 4px;
+    color: #353047;
+    font-size: 15px;
 }
 
-/* =================================
-   FOOTER
-================================= */
+/* Footer */
 
-.footer {
+.footer-text {
     text-align: center;
-    color: #987B89;
+    color: #9A8290;
     font-size: 13px;
-    margin-top: 35px;
-    padding-bottom: 12px;
+    margin-top: 25px;
 }
 
-/* =================================
-   RESPONSIVE DESIGN
-================================= */
+/* Divider */
 
-@media (max-width: 700px) {
+hr {
+    border-color: #DDBAC9;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
 
     .block-container {
         padding-left: 1rem;
         padding-right: 1rem;
     }
 
-    .header-box {
-        min-height: 100px;
-    }
-
     .header-title {
-        font-size: 30px;
+        font-size: 25px;
     }
 
     .section-title {
         font-size: 18px;
     }
 
-    .info-card {
-        margin-bottom: 10px;
-    }
-
 }
 
 </style>
-""", unsafe_allow_html=True)
+""")
 
 
 # ==========================================
 # HEADER
 # ==========================================
 
-st.markdown("""
+render_html("""
 <div class="header-box">
-    <p class="header-title">🍎 Fruit Classifier</p>
+    <div class="header-title">
+        🍎 Fruit Classifier
+    </div>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 
 # ==========================================
-# DECORATIVE FRUITS
-# ==========================================
-
-st.markdown("""
-<div class="fruit-decoration">
-    🍓 🍊 🍃
-</div>
-""", unsafe_allow_html=True)
-
-
-# ==========================================
-# LOAD MODEL
+# LOAD TRAINED MODEL
 # ==========================================
 
 @st.cache_resource
 def load_model():
 
-    if not MODEL_PATH.exists() or not LABELS_PATH.exists():
-        return None, None
+    if not MODEL_PATH.exists():
+        raise FileNotFoundError("fruit_classifier.keras is missing.")
+
+    if not LABELS_PATH.exists():
+        raise FileNotFoundError("class_names.json is missing.")
 
     model = tf.keras.models.load_model(MODEL_PATH)
 
@@ -483,62 +296,70 @@ def load_model():
         LABELS_PATH.read_text(encoding="utf-8")
     )
 
+    if not isinstance(labels, list):
+        raise ValueError("Invalid class_names.json format.")
+
+    if len(labels) != model.output_shape[-1]:
+        raise ValueError("Model output and class labels do not match.")
+
     return model, labels
 
 
-model, class_names = load_model()
+try:
 
+    model, class_names = load_model()
 
-if model is None:
+except Exception as e:
 
-    st.error(
-        "Trained model files are missing. "
-        "Please add fruit_classifier.keras and "
-        "class_names.json to the application folder."
-    )
+    st.error(f"Model loading failed: {e}")
 
     st.stop()
 
 
 # ==========================================
-# UPLOAD AND PREVIEW
+# IMAGE UPLOAD AND PREVIEW
 # ==========================================
 
 left, right = st.columns(2, gap="large")
 
+uploaded = None
+image = None
 
-# UPLOAD
+
+# ------------------------------------------
+# UPLOAD SECTION
+# ------------------------------------------
 
 with left:
 
-    st.markdown("""
+    render_html("""
     <div class="section-title">
-        Upload a Fruit Image
+        📤 Upload a Fruit Image
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
     uploaded = st.file_uploader(
-        "Choose Image",
+        "Choose an image",
         type=["jpg", "jpeg", "png", "webp"],
         label_visibility="collapsed"
     )
 
-    st.caption("Supported formats: JPG, PNG, WEBP")
+    st.caption("JPG, JPEG, PNG and WEBP")
 
 
-# PREVIEW
+# ------------------------------------------
+# PREVIEW SECTION
+# ------------------------------------------
 
 with right:
 
-    st.markdown("""
+    render_html("""
     <div class="section-title">
-        Image Preview
+        🖼️ Image Preview
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
-    image = None
-
-    if uploaded:
+    if uploaded is not None:
 
         try:
 
@@ -551,40 +372,32 @@ with right:
 
         except Exception:
 
-            st.error("Invalid image file.")
-            st.stop()
+            st.error("Invalid image. Please upload another image.")
 
     else:
 
-        st.markdown("""
+        render_html("""
         <div class="preview-card">
-
-            <div class="preview-icon">
-                🖼️
-            </div>
-
-            <div class="preview-text">
-                Image Preview
-            </div>
-
+            <div class="preview-icon">🖼️</div>
+            <div class="preview-text">Image Preview</div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
 
 # ==========================================
-# CLASSIFICATION BUTTON
+# CLASSIFY BUTTON
 # ==========================================
 
 st.write("")
 
-button_col1, button_col2, button_col3 = st.columns([1, 1.5, 1])
+col1, col2, col3 = st.columns([1, 1.5, 1])
 
-with button_col2:
+with col2:
 
     classify = st.button(
         "✨  Classify",
         use_container_width=True,
-        disabled=uploaded is None
+        disabled=(uploaded is None or image is None)
     )
 
 
@@ -592,22 +405,32 @@ with button_col2:
 # PREDICTION
 # ==========================================
 
-if classify and uploaded and image is not None:
+if classify and image is not None:
 
     try:
 
         with st.spinner("Analyzing your image..."):
 
+            # Resize image
+
             resized = image.resize(IMAGE_SIZE)
+
+            # Convert to NumPy array
 
             arr = np.asarray(
                 resized,
                 dtype=np.float32
             )
 
+            # Preprocess image
+
             arr = preprocess_input(arr)
 
+            # Add batch dimension
+
             arr = np.expand_dims(arr, axis=0)
+
+            # Predict
 
             probabilities = model.predict(
                 arr,
@@ -616,14 +439,13 @@ if classify and uploaded and image is not None:
 
             best_index = int(np.argmax(probabilities))
 
-            if best_index >= len(class_names):
-                raise ValueError("Model labels do not match its output.")
-
-            predicted = str(class_names[best_index])
+            predicted = class_names[best_index]
 
             confidence = float(probabilities[best_index]) * 100
 
-        st.markdown(f"""
+        # Display result
+
+        render_html(f"""
         <div class="result-card">
 
             <div class="result-label">
@@ -631,7 +453,7 @@ if classify and uploaded and image is not None:
             </div>
 
             <div class="result-name">
-                🍎 {escape(predicted)}
+                🍎 {predicted}
             </div>
 
             <div class="result-confidence">
@@ -639,7 +461,9 @@ if classify and uploaded and image is not None:
             </div>
 
         </div>
-        """, unsafe_allow_html=True)
+        """)
+
+        # Class probabilities
 
         with st.expander("View Class Probabilities"):
 
@@ -655,7 +479,9 @@ if classify and uploaded and image is not None:
                     f"**{name}** — {score * 100:.2f}%"
                 )
 
-                st.progress(float(score))
+                st.progress(
+                    float(np.clip(score, 0, 1))
+                )
 
     except Exception as e:
 
@@ -663,75 +489,53 @@ if classify and uploaded and image is not None:
 
 
 # ==========================================
-# DIVIDER
-# ==========================================
-
-st.markdown("""
-<div class="custom-divider"></div>
-""", unsafe_allow_html=True)
-
-
-# ==========================================
 # MODEL INFORMATION
 # ==========================================
+
+st.divider()
 
 c1, c2, c3 = st.columns(3, gap="medium")
 
 
 with c1:
 
-    st.markdown("""
+    render_html("""
     <div class="info-card">
-
         <div class="info-icon">🧠</div>
-
-        <div>
-            <div class="info-heading">Model</div>
-            <div class="info-text">MobileNetV2</div>
-        </div>
-
+        <div class="info-heading">Model</div>
+        <div class="info-text">MobileNetV2</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 
 with c2:
 
-    st.markdown("""
+    render_html("""
     <div class="info-card">
-
         <div class="info-icon">📚</div>
-
-        <div>
-            <div class="info-heading">Dataset</div>
-            <div class="info-text">Fruits-360</div>
-        </div>
-
+        <div class="info-heading">Dataset</div>
+        <div class="info-text">Fruits-360</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 
 with c3:
 
-    st.markdown("""
+    render_html("""
     <div class="info-card">
-
         <div class="info-icon">⚙️</div>
-
-        <div>
-            <div class="info-heading">Approach</div>
-            <div class="info-text">Transfer Learning</div>
-        </div>
-
+        <div class="info-heading">Approach</div>
+        <div class="info-text">Transfer Learning</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 
 # ==========================================
 # FOOTER
 # ==========================================
 
-st.markdown("""
-<div class="footer">
+render_html("""
+<div class="footer-text">
     Fruit Classifier | Deep Learning Project
 </div>
-""", unsafe_allow_html=True)
+""")
