@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from textwrap import dedent
+from html import escape
 
 import numpy as np
 import streamlit as st
@@ -32,79 +32,56 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Page background */
+/* Background */
 
 .stApp {
     background-color: #FFF9F2;
 }
 
-/* Hide Streamlit default header and toolbar */
+/* Hide Streamlit header */
 
-header[data-testid="stHeader"] {
-    display: none;
+[data-testid="stHeader"] {
+    height: 0;
+    visibility: hidden;
 }
 
 [data-testid="stToolbar"] {
     display: none;
 }
 
-/* Main container */
-
-.block-container {
-    max-width: 1100px;
-    padding-top: 2rem !important;
-    padding-bottom: 1rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
-    margin-top: 0;
-}
-
-/* Hide unnecessary Streamlit elements */
-
-#MainMenu {
-    visibility: hidden;
-}
-
+#MainMenu,
 footer {
     visibility: hidden;
 }
 
-/* Header */
+/* Main container */
+
+.block-container {
+    max-width: 1050px;
+    padding-top: 1.5rem !important;
+    padding-bottom: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+/* Top maroon bar */
 
 .header-box {
     background-color: #720D2B;
-    padding: 18px 25px;
     border-radius: 12px;
-    margin-top: 5px;
-    margin-bottom: 20px;
+    padding: 19px 20px;
+    text-align: center;
+    margin-bottom: 35px;
     width: 100%;
     box-sizing: border-box;
-    text-align: center;
 }
 
 .header-title {
-    color: white;
+    color: white !important;
     font-size: 27px;
     font-weight: 700;
     margin: 0;
-    text-align: center;
-}
-
-/* Main title */
-
-.main-title {
-    color: #35132E;
-    text-align: center;
-    font-size: 36px;
-    font-weight: 700;
-    margin-bottom: 3px;
-}
-
-.subtitle {
-    color: #777777;
-    text-align: center;
-    font-size: 16px;
-    margin-bottom: 22px;
+    padding: 0;
 }
 
 /* Section headings */
@@ -113,27 +90,62 @@ footer {
     color: #35132E;
     font-size: 21px;
     font-weight: 650;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
-/* Upload section */
+/* Upload box */
 
 [data-testid="stFileUploader"] {
     background-color: white;
     border: 1px dashed #B99AA7;
     border-radius: 12px;
-    padding: 12px;
+    padding: 13px;
+    min-height: 110px;
 }
 
-/* Image preview */
+/* File uploader text */
+
+[data-testid="stFileUploader"] section {
+    background-color: #F7F4F5;
+    border-radius: 9px;
+}
+
+/* Preview image */
+
+[data-testid="stImage"] {
+    display: flex;
+    justify-content: center;
+}
 
 [data-testid="stImage"] img {
-    max-height: 230px;
+    max-height: 220px;
     object-fit: contain;
-    border-radius: 10px;
+    border-radius: 12px;
 }
 
-/* Buttons */
+/* Empty preview box */
+
+.preview-box {
+    background-color: #F3EBED;
+    height: 205px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #8A7880;
+    font-size: 15px;
+    text-align: center;
+}
+
+/* Supported formats */
+
+.upload-caption {
+    color: #888888;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+/* Classification button */
 
 .stButton > button {
     background-color: #850E3A;
@@ -142,7 +154,8 @@ footer {
     border-radius: 9px;
     font-size: 17px;
     font-weight: 600;
-    min-height: 45px;
+    min-height: 46px;
+    transition: 0.2s;
 }
 
 .stButton > button:hover {
@@ -151,73 +164,67 @@ footer {
     border: none;
 }
 
-/* Result card */
+/* Prediction card */
 
 .result-card {
     background-color: #F4EAF0;
     border: 1px solid #E5CCD8;
     border-radius: 13px;
-    padding: 17px;
+    padding: 16px;
     text-align: center;
-    margin-top: 15px;
+    margin-top: 18px;
 }
 
 .result-label {
-    color: #555555;
-    font-size: 16px;
+    color: #666666;
+    font-size: 15px;
 }
 
 .result-name {
     color: #850E3A;
-    font-size: 29px;
+    font-size: 28px;
     font-weight: bold;
     margin: 5px 0;
 }
 
 .result-confidence {
     color: #35132E;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
 }
 
-/* Information cards */
+/* Expander */
 
-.info-card {
-    background-color: white;
-    border: 1px solid #E8DDE2;
+[data-testid="stExpander"] {
+    border: 1px solid #E5CCD8;
     border-radius: 10px;
-    padding: 12px 5px;
-    text-align: center;
-}
-
-.info-icon {
-    font-size: 23px;
-}
-
-.info-heading {
-    color: #35132E;
-    font-size: 15px;
-    font-weight: bold;
-}
-
-.info-text {
-    color: #777777;
-    font-size: 13px;
-}
-
-/* Footer */
-
-.footer-text {
-    text-align: center;
-    color: #888888;
-    font-size: 12px;
-    margin-top: 18px;
+    background-color: white;
+    margin-top: 10px;
 }
 
 /* Reduce vertical spacing */
 
 div[data-testid="stVerticalBlock"] {
-    gap: 0.7rem;
+    gap: 0.65rem;
+}
+
+/* Responsive design */
+
+@media (max-width: 650px) {
+
+    .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .header-title {
+        font-size: 23px;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+
 }
 
 </style>
@@ -228,29 +235,11 @@ div[data-testid="stVerticalBlock"] {
 # HEADER
 # ==========================================
 
-st.markdown(
-    dedent("""
-    <div class="header-box">
-        <p class="header-title">🍎 Fruit Classifier</p>
-    </div>
-    """),
-    unsafe_allow_html=True
-)
-
-
-# ==========================================
-# MAIN HEADING
-# ==========================================
-
-st.markdown(
-    dedent("""
-    <div class="main-title">Fruit Classification</div>
-    <div class="subtitle">
-        Identify fruits instantly using Deep Learning
-    </div>
-    """),
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div class="header-box">
+    <p class="header-title">🍎 Fruit Classifier</p>
+</div>
+""", unsafe_allow_html=True)
 
 
 # ==========================================
@@ -293,21 +282,30 @@ if model is None:
 left, right = st.columns(2, gap="large")
 
 
+# Upload section
+
 with left:
 
     st.markdown(
-        '<div class="section-title">📤 Upload a Fruit Image</div>',
+        '<div class="section-title">📤 Upload Image</div>',
         unsafe_allow_html=True
     )
 
     uploaded = st.file_uploader(
-        "Choose an image",
+        "Choose a fruit image",
         type=["jpg", "jpeg", "png", "webp"],
         label_visibility="collapsed"
     )
 
-    st.caption("Supported formats: JPG, JPEG, PNG, WEBP")
+    st.markdown(
+        '<div class="upload-caption">'
+        'Supported formats: JPG, PNG, WEBP'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
+
+# Preview section
 
 with right:
 
@@ -318,33 +316,25 @@ with right:
 
     if uploaded:
 
-        image = Image.open(uploaded).convert("RGB")
+        try:
+            image = Image.open(uploaded).convert("RGB")
 
-        st.image(
-            image,
-            width=350
-        )
+            st.image(
+                image,
+                use_container_width=True
+            )
+
+        except Exception:
+            st.error("Unable to open this image.")
+            st.stop()
 
     else:
 
-        st.markdown(
-            dedent("""
-            <div style="
-                background-color: #F3EBED;
-                height: 190px;
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                color: #777777;
-                font-size: 16px;
-            ">
-                Your uploaded image will appear here
-            </div>
-            """),
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="preview-box">
+            Your image will appear here
+        </div>
+        """, unsafe_allow_html=True)
 
 
 # ==========================================
@@ -353,9 +343,9 @@ with right:
 
 st.write("")
 
-button_col1, button_col2, button_col3 = st.columns([1, 2, 1])
+col1, col2, col3 = st.columns([1, 2, 1])
 
-with button_col2:
+with col2:
 
     classify = st.button(
         "✨  Classify Fruit",
@@ -372,7 +362,7 @@ if classify and uploaded:
 
     try:
 
-        with st.spinner("Analyzing your image..."):
+        with st.spinner("Analyzing image..."):
 
             resized = image.resize(IMAGE_SIZE)
 
@@ -392,34 +382,38 @@ if classify and uploaded:
 
             best_index = int(np.argmax(probabilities))
 
-            predicted = class_names[best_index]
+            if best_index >= len(class_names):
+                raise ValueError(
+                    "Model output does not match the class labels."
+                )
+
+            predicted = str(class_names[best_index])
 
             confidence = (
                 float(probabilities[best_index]) * 100
             )
 
-        # Display prediction
+        # Prediction result
 
-        st.markdown(
-            dedent(f"""
-            <div class="result-card">
-                <div class="result-label">
-                    Predicted Fruit
-                </div>
+        st.markdown(f"""
+        <div class="result-card">
 
-                <div class="result-name">
-                    🍎 {predicted}
-                </div>
-
-                <div class="result-confidence">
-                    Confidence: {confidence:.2f}%
-                </div>
+            <div class="result-label">
+                Predicted Fruit
             </div>
-            """),
-            unsafe_allow_html=True
-        )
 
-        # Display class probabilities
+            <div class="result-name">
+                🍎 {escape(predicted)}
+            </div>
+
+            <div class="result-confidence">
+                Confidence: {confidence:.2f}%
+            </div>
+
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Class probabilities
 
         with st.expander("View Class Probabilities"):
 
@@ -443,69 +437,16 @@ if classify and uploaded:
 
 
 # ==========================================
-# MODEL INFORMATION
-# ==========================================
-
-st.divider()
-
-st.markdown(
-    '<h3 style="text-align:center; color:#35132E;">'
-    'Model Information</h3>',
-    unsafe_allow_html=True
-)
-
-c1, c2, c3 = st.columns(3)
-
-
-with c1:
-
-    st.markdown(
-        dedent("""
-        <div class="info-card">
-            <div class="info-icon">🧠</div>
-            <div class="info-heading">Model</div>
-            <div class="info-text">MobileNetV2</div>
-        </div>
-        """),
-        unsafe_allow_html=True
-    )
-
-
-with c2:
-
-    st.markdown(
-        dedent("""
-        <div class="info-card">
-            <div class="info-icon">🗂️</div>
-            <div class="info-heading">Dataset</div>
-            <div class="info-text">Fruits-360</div>
-        </div>
-        """),
-        unsafe_allow_html=True
-    )
-
-
-with c3:
-
-    st.markdown(
-        dedent("""
-        <div class="info-card">
-            <div class="info-icon">⚙️</div>
-            <div class="info-heading">Approach</div>
-            <div class="info-text">Transfer Learning</div>
-        </div>
-        """),
-        unsafe_allow_html=True
-    )
-
-
-# ==========================================
 # FOOTER
 # ==========================================
 
-st.markdown(
-    '<div class="footer-text">'
-    'Fruit Classifier | Deep Learning Project'
-    '</div>',
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div style="
+    text-align:center;
+    color:#999999;
+    font-size:12px;
+    margin-top:25px;
+">
+    Fruit Classifier | Deep Learning Project
+</div>
+""", unsafe_allow_html=True)
