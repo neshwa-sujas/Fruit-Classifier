@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 from textwrap import dedent
@@ -80,6 +79,7 @@ footer {
     margin-bottom: 20px;
     width: 100%;
     box-sizing: border-box;
+    text-align: center;
 }
 
 .header-title {
@@ -87,6 +87,7 @@ footer {
     font-size: 27px;
     font-weight: 700;
     margin: 0;
+    text-align: center;
 }
 
 /* Main title */
